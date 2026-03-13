@@ -84,6 +84,7 @@ pointer-events:none;
 <img id="bird" src="player.png">
 <img id="boom" src="ledakan.gif">
 <audio id="boomSound" src="audioLedakan.mp3"></audio>
+    <audio id="jumpSound" src="tiktik.mp3"></audio>
 
 <canvas id="game"></canvas>
 
@@ -95,6 +96,7 @@ const ctx=canvas.getContext("2d");
 const bird=document.getElementById("bird");
 const boom=document.getElementById("boom");
     const boomSound = document.getElementById("boomSound");
+    const jumpSound = document.getElementById("jumpSound");
 
 const bgImg=new Image();
 
@@ -279,6 +281,8 @@ function flap(){
 
 if(gameOver) return;
 velocity=jump;
+    jumpSound.currentTime = 0;
+jumpSound.play();
 
 }
 
