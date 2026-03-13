@@ -83,6 +83,7 @@ pointer-events:none;
 
 <img id="bird" src="player.png">
 <img id="boom" src="ledakan.gif">
+<audio id="boomSound" src="audioLedakan.mp3"></audio>
 
 <canvas id="game"></canvas>
 
@@ -93,6 +94,7 @@ const ctx=canvas.getContext("2d");
 
 const bird=document.getElementById("bird");
 const boom=document.getElementById("boom");
+    const boomSound = document.getElementById("boomSound");
 
 const bgImg=new Image();
 
@@ -289,6 +291,9 @@ bird.style.display="none";
 boom.style.left="60px";
 boom.style.top=(birdY-birdSize/2)+"px";
 boom.style.display="block";
+
+    boomSound.currentTime = 0;
+boomSound.play();
 
 setTimeout(()=>{
 
