@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Flappy Bird</title>
+
+<style>
+
+body{
+margin:0;
+overflow:hidden;
+font-family:sans-serif;
+background:#70c5ce;
+}
+
+canvas{
+display:block;
+}
+
+#score{
+position:absolute;
+top:20px;
+left:50%;
+transform:translateX(-50%);
+font-size:35px;
+color:white;
+font-weight:bold;
+}
+
+#countdown{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+font-size:80px;
+color:white;
+font-weight:bold;
+}
+
+#restart{
+position:absolute;
+bottom:40px;
+left:50%;
+transform:translateX(-50%);
+padding:15px 30px;
+font-size:20px;
+border:none;
+border-radius:10px;
+background:#ffcc00;
+display:none;
+}
+
+#gear{
+position:absolute;
+top:20px;
+right:20px;
+font-size:28px;
+background:white;
+padding:8px 12px;
+border-radius:10px;
+cursor:pointer;
+}
+
+#panel{
+position:absolute;
+top:70px;
+right:20px;
+background:white;
+padding:15px;
+border-radius:10px;
+display:none;
+width:230px;
+}
+
+#panel input{
+width:100%;
+margin-top:6px;
+}
+
+#birdGif{
+position:absolute;
+left:60px;
+width:80px;
+pointer-events:none;
+}
+
+#collisionGif{
+position:absolute;
+width:120px;
+display:none;
+pointer-events:none;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="score">0</div>
+<div id="countdown">3</div>
+
+<button id="restart">Restart</button>
+
+<div id="gear">⚙️</div>
+
+<div id="panel">
+
+<label>Burung (GIF / PNG)</label>
+<input type="file" id="birdUpload" accept="image/*">
+
+<label>Ukuran Burung</label>
+<input type="range" id="birdSize" min="40" max="200" value="80">
+
+<label>Background</label>
+<input type="file" id="bgUpload" accept="image/*">
+
+<label>GIF Tabrakan</label>
+<input type="file" id="gifUpload" accept="image/gif">
+
+<label>Durasi GIF (detik)</label>
+<input type="number" id="gifDuration" value="2" min="1" max="10">
+
+</div>
+
+<img id="birdGif">
+<img id="collisionGif">
+
+<canvas id="game"></canvas>
+
+<script>
+
+const canvas=document.getElementById("game");
+const ctx=canvas.getContext("2d");
+
+const birdGif=document.getElementById("birdGif");
+const collisionGif=document.getElementById("collisionGif");
+
+function resize(){
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+}
+resize();
+window.addEventListener("resize",resize);
+
+let birdY;
+let velocity;
+
+let gravity=0.6;
+let jump=-10;
+
+let birdSize=80;
+
+let pipes=[];
+let pipeWidth=70;
+let gap=200;
+
+let score=0;
+
+let gameOver=false;
+let gameStarted=false;
+
+let bgImg=null;
+
+let gifDuration=2000;
+
+function resetGame(){
+
+birdY=canvas.height/2;
+velocity=0;
+
+pipes=[];
+score=0;
+
+gameOver=false;
+gameStarted=false;
+
+birdGif.style.display="block";
+
+collisionGif.style.display="none";
+
+document.getElementById("score").innerText=0;
+
+document.getElementById("restart").style.display="none";
+
+startCountdown();
+
+}
+
+function startCountdown(){
+
+let count=3;
+
+const cd=document.getElementById("countdown");
+
+cd.style.display="block";
+cd.innerText=count;
+
+let timer=setInterval(()=>{
+
+count--;
+
+if(count>0){
+
+cd.innerText=count;
+
+}else if(count===0){
+
+cd.innerText="GO";
+
+}else{
+
+clearInterval(timer);
+
+cd.style.display="none";
+
+gameStarted=true;
+
+}
+
+},1000);
+
+}
+
+function spawnPipe(){
+
+let topHeight=Math.random()*(canvas.height-400)+50;
+
+pipes.push({
+
+x:canvas.width,
+
+top:topHeight,
+
+bottom:topHeight+gap,
+
+passed:false
+
+});
+
+}
+
+setInterval(()=>{
+
+if(gameStarted && !gameOver){
+
+spawnPipe();
+
+}
+
+},2000);
+
+function update(){
+
+if(!gameStarted || gameOver) return;
+
+velocity+=gravity;
+
+birdY+=velocity;
+
+if(birdY>canvas.height){
+
+endGame();
+
+}
+
+for(let p of pipes){
+
+p.x-=4;
+
+if(!p.passed && p.x<80){
+
+score++;
+
+document.getElementById("score").innerText=score;
+
+p.passed=true;
+
+}
+
+if(
+
+80+birdSize/2>p.x &&
+
+80-birdSize/2<p.x+pipeWidth &&
+
+(birdY-birdSize/2<p.top || birdY+birdSize/2>p.bottom)
+
+){
+
+endGame();
+
+}
+
+}
+
+}
+
+function draw(){
+
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+if(bgImg){
+
+ctx.drawImage(bgImg,0,0,canvas.width,canvas.height);
+
+}else{
+
+ctx.fillStyle="#70c5ce";
+
+ctx.fillRect(0,0,canvas.width,canvas.height);
+
+}
+
+for(let p of pipes){
+
+ctx.fillStyle="green";
+
+ctx.fillRect(p.x,0,pipeWidth,p.top);
+
+ctx.fillRect(p.x,p.bottom,pipeWidth,canvas.height-p.bottom);
+
+}
+
+birdGif.style.top=(birdY-birdSize/2)+"px";
+birdGif.style.width=birdSize+"px";
+
+if(gameOver){
+
+ctx.fillStyle="black";
+ctx.font="50px sans-serif";
+
+ctx.fillText("GAME OVER",canvas.width/2-150,canvas.height/2);
+
+}
+
+}
+
+function loop(){
+
+update();
+
+draw();
+
+requestAnimationFrame(loop);
+
+}
+
+loop();
+
+function flap(){
+
+if(gameOver) return;
+
+velocity=jump;
+
+}
+
+function endGame(){
+
+gameOver=true;
+
+birdGif.style.display="none";
+
+collisionGif.style.left="60px";
+
+collisionGif.style.top=(birdY-birdSize/2)+"px";
+
+if(collisionGif.src){
+
+collisionGif.style.display="block";
+
+setTimeout(()=>{
+
+collisionGif.style.display="none";
+
+document.getElementById("restart").style.display="block";
+
+},gifDuration);
+
+}else{
+
+document.getElementById("restart").style.display="block";
+
+}
+
+}
+
+document.addEventListener("click",flap);
+document.addEventListener("touchstart",flap);
+
+document.addEventListener("keydown",e=>{
+
+if(e.code==="Space") flap();
+
+});
+
+document.getElementById("restart").onclick=resetGame;
+
+document.getElementById("gear").onclick=()=>{
+
+let panel=document.getElementById("panel");
+
+panel.style.display=panel.style.display==="none"?"block":"none";
+
+}
+
+document.getElementById("birdUpload").onchange=(e)=>{
+
+let file=e.target.files[0];
+
+if(file){
+
+birdGif.src=URL.createObjectURL(file);
+
+}
+
+}
+
+document.getElementById("birdSize").oninput=(e)=>{
+
+birdSize=parseInt(e.target.value);
+
+}
+
+document.getElementById("bgUpload").onchange=(e)=>{
+
+let file=e.target.files[0];
+
+if(file){
+
+let img=new Image();
+
+img.src=URL.createObjectURL(file);
+
+img.onload=()=>bgImg=img;
+
+}
+
+}
+
+document.getElementById("gifUpload").onchange=(e)=>{
+
+let file=e.target.files[0];
+
+if(file){
+
+collisionGif.src=URL.createObjectURL(file);
+
+}
+
+}
+
+document.getElementById("gifDuration").oninput=(e)=>{
+
+gifDuration=parseInt(e.target.value)*1000;
+
+}
+
+resetGame();
+
+</script>
+
+</body>
+</html>
