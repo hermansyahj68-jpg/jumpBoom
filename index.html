@@ -84,7 +84,7 @@ pointer-events:none;
 <img id="bird" src="player.png">
 <img id="boom" src="ledakan.gif">
 <audio id="boomSound" src="audioLedakan.mp3"></audio>
-    <audio id="jumpSound" src="tiktik.mp3"></audio>
+    <audio id="jumpSound" src="tiktik.mp3" preload="auto"></audio>
 
 <canvas id="game"></canvas>
 
@@ -280,11 +280,15 @@ loop();
 function flap(){
 
 if(gameOver) return;
-velocity=jump;
-    jumpSound.currentTime = 0;
+
+velocity = jump;
+
+// reset suara agar bisa diputar berulang
+jumpSound.pause();
+jumpSound.currentTime = 0;
 jumpSound.play();
 
-}
+    }
 
 function endGame(){
 
