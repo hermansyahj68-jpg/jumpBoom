@@ -4,7 +4,8 @@ const urlsToCache = [
   "./",
   "./index.html",
   "./logo.png",
-  "./audioLedakan.mp3"
+  "./audioLedakan.mp3",
+  "./tiktik.mp3"
 ];
 
 self.addEventListener("install", function(event) {
