@@ -91,7 +91,12 @@ const bird=document.getElementById("bird");
 const boom=document.getElementById("boom");
 
 const bgImg=new Image();
-bgImg.src="LatarBelakang.jpg";
+
+bgImg.onload = function(){
+    resetGame();   // game baru mulai setelah gambar siap
+}
+
+bgImg.src = "latarBelakang.jpg";
 
 function resize(){
 canvas.width=window.innerWidth;
