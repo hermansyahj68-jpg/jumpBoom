@@ -7,8 +7,7 @@
 <title>JumpBoom</title>
 
 <link rel="icon" href="icon.png">
-
-    <link rel="manifest" href="manifest.json">
+<link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#000000">
 <link rel="apple-touch-icon" href="icon.png">
 
@@ -32,6 +31,19 @@ transform:translateX(-50%);
 font-size:35px;
 color:white;
 font-weight:bold;
+}
+
+#lives{
+position:absolute;
+top:25px;
+right:20px;
+display:flex;
+gap:6px;
+}
+
+.life{
+width:22px;
+height:22px;
 }
 
 #countdown{
@@ -71,34 +83,22 @@ display:none;
 pointer-events:none;
 }
 
-    #lives{
-position:absolute;
-top:25px;
-right:20px;
-display:flex;
-gap:5px;
-}
-
-.life{
-width:22px;
-height:22px;
-}
-
 </style>
 </head>
 
 <body>
-    
-<div id="lives"></div>
+
 <div id="score">0</div>
+<div id="lives"></div>
 <div id="countdown">3</div>
 
 <button id="restart">Restart</button>
 
 <img id="bird" src="player.png">
 <img id="boom" src="ledakan.gif">
+
 <audio id="boomSound" src="audioLedakan.mp3"></audio>
-    <audio id="jumpSound" src="tiktik.mp3" preload="auto"></audio>
+<audio id="jumpSound" src="tiktik.mp3" preload="auto"></audio>
 
 <canvas id="game"></canvas>
 
@@ -109,16 +109,12 @@ const ctx=canvas.getContext("2d");
 
 const bird=document.getElementById("bird");
 const boom=document.getElementById("boom");
-    const boomSound = document.getElementById("boomSound");
-    const jumpSound = document.getElementById("jumpSound");
+
+const boomSound=document.getElementById("boomSound");
+const jumpSound=document.getElementById("jumpSound");
 
 const bgImg=new Image();
-
-bgImg.onload = function(){
-    resetGame();   // game baru mulai setelah gambar siap
-}
-
-bgImg.src = "latarBelakang.jpg";
+bgImg.src="latarBelakang.jpg";
 
 function resize(){
 canvas.width=window.innerWidth;
@@ -145,6 +141,23 @@ let lives=3;
 let gameOver=false;
 let gameStarted=false;
 
+function drawLives(){
+
+const livesDiv=document.getElementById("lives");
+livesDiv.innerHTML="";
+
+for(let i=0;i<lives;i++){
+
+let img=document.createElement("img");
+img.src="icon.png";
+img.className="life";
+
+livesDiv.appendChild(img);
+
+}
+
+}
+
 function resetGame(){
 
 birdY=canvas.height/2;
@@ -152,6 +165,9 @@ velocity=0;
 
 pipes=[];
 score=0;
+lives=3;
+
+drawLives();
 
 gameOver=false;
 gameStarted=false;
@@ -165,24 +181,6 @@ document.getElementById("restart").style.display="none";
 startCountdown();
 
 }
-
-    function drawLives(){
-
-const livesDiv=document.getElementById("lives");
-livesDiv.innerHTML="";
-
-for(let i=0;i<lives;i++){
-
-let img=document.createElement("img");
-img.src="player.png";   // icon nyawa
-img.className="life";
-
-livesDiv.appendChild(img);
-
-}
-    }
-
-    
 
 function startCountdown(){
 
@@ -237,19 +235,9 @@ spawnPipe();
 
 },2000);
 
-function update(){
-
-if(!gameStarted || gameOver) return;
-
-velocity+=gravity;
-birdY+=velocity;
-
-if(birdY>canvas.height){
-
-    function hit(){
+function hit(){
 
 lives--;
-
 drawLives();
 
 bird.style.display="none";
@@ -267,13 +255,7 @@ boom.style.display="none";
 
 if(lives<=0){
 
-function endGame(){
-
-gameOver=true;
-
-document.getElementById("restart").style.display="block";
-
-}
+endGame();
 
 }else{
 
@@ -285,9 +267,27 @@ velocity=0;
 
 },800);
 
-    }
-    
-endGame();
+}
+
+function endGame(){
+
+gameOver=true;
+
+bird.style.display="none";
+
+document.getElementById("restart").style.display="block";
+
+}
+
+function update(){
+
+if(!gameStarted || gameOver) return;
+
+velocity+=gravity;
+birdY+=velocity;
+
+if(birdY>canvas.height){
+hit();
 }
 
 for(let p of pipes){
@@ -356,34 +356,11 @@ function flap(){
 
 if(gameOver) return;
 
-velocity = jump;
+velocity=jump;
 
-// reset suara agar bisa diputar berulang
 jumpSound.pause();
-jumpSound.currentTime = 0;
+jumpSound.currentTime=0;
 jumpSound.play();
-
-    }
-
-function endGame(){
-
-gameOver=true;
-
-bird.style.display="none";
-
-boom.style.left="60px";
-boom.style.top=(birdY-birdSize/2)+"px";
-boom.style.display="block";
-
-    boomSound.currentTime = 0;
-boomSound.play();
-
-setTimeout(()=>{
-
-boom.style.display="none";
-document.getElementById("restart").style.display="block";
-
-},1500); // 1.5 detik
 
 }
 
@@ -396,20 +373,9 @@ if(e.code==="Space") flap();
 
 document.getElementById("restart").onclick=resetGame;
 
-function resetGame(){
-
-birdY=canvas.height/2;
-velocity=0;
-
-pipes=[];
-score=0;
-lives=3;
-
-drawLives();
-
-gameOver=false;
-gameStarted=false;
-}
+bgImg.onload=function(){
+resetGame();
+};
 
 </script>
 
