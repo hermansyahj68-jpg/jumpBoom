@@ -137,6 +137,7 @@ let gap=200;
 
 let score=0;
 let lives=3;
+  let invincible=false;
 
 let gameOver=false;
 let gameStarted=false;
@@ -166,6 +167,7 @@ velocity=0;
 pipes=[];
 score=0;
 lives=3;
+  invincible=false;
 
 drawLives();
 
@@ -237,6 +239,10 @@ spawnPipe();
 
 function hit(){
 
+if(invincible || gameOver) return;
+
+invincible=true;
+
 lives--;
 drawLives();
 
@@ -264,6 +270,8 @@ birdY=canvas.height/2;
 velocity=0;
 
 }
+
+invincible=false;
 
 },800);
 
