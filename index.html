@@ -265,6 +265,73 @@ endGame();
 
 }else{
 
+continueCountdown();
+
+}
+
+},800);
+
+}
+
+  function continueCountdown(){
+
+const cd=document.getElementById("countdown");
+
+let count=2;
+
+cd.style.display="block";
+cd.innerText=count;
+
+let timer=setInterval(()=>{
+
+count--;
+
+if(count>0){
+
+cd.innerText=count;
+
+}else if(count===0){
+
+cd.innerText="GO";
+
+}else{
+
+clearInterval(timer);
+
+cd.style.display="none";
+
+bird.style.display="block";
+
+birdY=canvas.height/2;
+velocity=0;
+
+invincible=false;
+
+}
+
+},1000);
+
+}
+
+bird.style.display="none";
+
+boom.style.left="60px";
+boom.style.top=(birdY-birdSize/2)+"px";
+boom.style.display="block";
+
+boomSound.currentTime=0;
+boomSound.play();
+
+setTimeout(()=>{
+
+boom.style.display="none";
+
+if(lives<=0){
+
+endGame();
+
+}else{
+
 bird.style.display="block";
 birdY=canvas.height/2;
 velocity=0;
